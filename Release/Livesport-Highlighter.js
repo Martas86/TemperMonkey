@@ -25,7 +25,6 @@
             //alert('#foo is hidden');
             highlight();
         });
-
         //$("span.flag fl_62").closest('tr').css('color','blue');
     });
 
