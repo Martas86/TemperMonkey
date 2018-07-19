@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Livesport Highlighter
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  try to take over the world!
 // @author       You
 // @include      https://www.livesport.cz/*
@@ -25,8 +25,7 @@
             //alert('#foo is hidden');
             highlight();
         });
-        //test
-		//$("span.flag fl_62").closest('tr').css('color','blue');
+        //$("span.flag fl_62").closest('tr').css('color','blue');
     });
 
     function highlight() {
