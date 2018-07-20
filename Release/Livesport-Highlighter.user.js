@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Livesport Highlighter
+// @name         Livesport - Highlighter
 // @namespace    https://github.com/Martas86/TamperMonkey
 // @version      0.3
 // @description  try to take over the world!
