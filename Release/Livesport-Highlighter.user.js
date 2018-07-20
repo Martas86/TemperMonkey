@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Livesport Highlighter
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/Martas86/TamperMonkey
 // @version      0.3
 // @description  try to take over the world!
 // @author       You
@@ -8,13 +8,14 @@
 // @exclude      https://www.livesport.cz/zapas/*
 // @grant        none
 // @require      http://code.jquery.com/jquery-latest.js
-// @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/Livesport-Highlighter.js
+// @xupdateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/Livesport-Highlighter.user.js
 // ==/UserScript==
 
 (function() {
     'use strict';
 
     // Your code here...
+	$ = window.jQuery;
     $(document).ready(function() {
         //alert($("#mc").attr("class"));
         $("#mc").on('hide', '#fs_overlay', function() {
@@ -42,5 +43,5 @@
                 return el.apply(this, arguments);
             };
         });
-    })(jQuery);
+    })(window.jQuery);
 })();
