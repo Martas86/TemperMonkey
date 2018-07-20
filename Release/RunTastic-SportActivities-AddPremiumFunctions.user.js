@@ -7,7 +7,7 @@
 // @match        https://www.runtastic.com/cs/uzivatele/b4cbaf63-fbf3-d613-1ebc-7e8ceee7be3e/sportovni-aktivity
 // @require      http://code.jquery.com/jquery-1.8.3.min.js
 // @grant        none
-// @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/RunTastic-SportActivities-AddPremiumFunctions.user.js
+// @xupdateURL   https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/RunTastic-SportActivities-AddPremiumFunctions.user.js
 // @run-at document-start
 // ==/UserScript==
 
@@ -118,4 +118,4 @@
             //$("#runsessions #calendar_overview_js .container_js #sumtable thead tr .type").css("width", "100px");
         });
     });
-})(window.jQuery);
+})();
