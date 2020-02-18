@@ -8,7 +8,8 @@
 // @exclude      https://www.livesport.cz/zapas/*
 // @grant        none
 // @require      http://code.jquery.com/jquery-latest.js
-// @xupdateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/Livesport-Highlighter.user.js
+// @updateURL    https://github.com/Martas86/TamperMonkey/raw/master/Release/Livesport-Highlighter.user.js
+// @downloadURL  https://github.com/Martas86/TamperMonkey/raw/master/Release/Livesport-Highlighter.user.js
 // ==/UserScript==
 
 (function() {
