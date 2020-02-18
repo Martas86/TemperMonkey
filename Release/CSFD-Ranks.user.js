@@ -7,6 +7,7 @@
 // @match        https://www.csfd.cz/zebricky/specificky-vyber/*
 // @grant        none
 // @xupdateURL   https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-Ranks.user.js
+// @updateURL   https://github.com/Martas86/TamperMonkey/raw/master/Release/CSFD-Ranks.user.js
 // ==/UserScript==
 
 (function() {
