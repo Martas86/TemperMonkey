@@ -12,7 +12,7 @@
 (function() {
     'use strict';
 
-    // Your code here...
+    // Your code here....
 	$ = window.jQuery;
     function rwsCntRecalc() {
         $("#xRwsCnt").text("(" + $("#results table.content tbody tr td.order:visible").length + ")");
