@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         YouTube
-// @namespace    http://tampermonkey.net/
-// @version      0.1
+// @namespace    https://github.com/Martas86/TamperMonkey
+// @version      0.2
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.youtube.com/watch*
 // @grant        none
 // @require 	 https://code.jquery.com/jquery-latest.js
+// @downloadURL  https://github.com/Martas86/TamperMonkey/raw/master/Release/YouTube.user.js
 // @updateURL    https://github.com/Martas86/TamperMonkey/raw/master/Release/YouTube.user.js
 // ==/UserScript==
 
