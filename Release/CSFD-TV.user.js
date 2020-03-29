@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        https://www.csfd.cz/televize
+// @match        https://www.csfd.cz/televize/
 // @grant        none
 // @downloadURL  https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-TV.user.js
 // @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-TV.user.js
@@ -18,9 +18,9 @@
 
     $(document).ready(function() {
 		var wideAdd = 1500;
-		$("#page-wrapper").css("width", $("#page-wrapper").css("width") + wideAdd);
-		$("#program").css("width", $("#program").css("width") + wideAdd);
-		$("#program .scroller").css("width", $("#program .scroller").css("width") + wideAdd);
+		$("#page-wrapper").width($("#page-wrapper").width() + wideAdd);
+		$("#program").width($("#program").width() + wideAdd);
+		$("#program .scroller").width($("#program .scroller").width() + wideAdd);
     });
 
 })();
