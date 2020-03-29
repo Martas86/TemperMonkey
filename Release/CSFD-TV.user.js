@@ -6,7 +6,8 @@
 // @author       You
 // @match        https://www.csfd.cz/televize
 // @grant        none
-// @xupdateURL   https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-TV.user.js
+// @downloadURL  https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-TV.user.js
+// @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/CSFD-TV.user.js
 // ==/UserScript==
 
 (function() {
