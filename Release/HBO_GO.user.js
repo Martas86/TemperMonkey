@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HBO GO
 // @namespace    https://github.com/Martas86/TamperMonkey
-// @version      0.1
+// @version      0.3
 // @description  try to take over the world!
 // @author       You
 // @match        https://hbogo.cz/*
