@@ -17,6 +17,59 @@
     // Your code here...
     var $ = window.jQuery;
 
+    function csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+    {
+        var csfdElmTxt = "<div class='csfd' style='position: absolute; z-index:10; margin-top: 1px; background-color:" + rankingColor + "'><a href='" + href + "'>" + "CSFD" + " / " + ratingValue + "% / " + ratingCount + "</a></div>";
+        if ($(movieContainer).find(".csfd").length > 0)
+            $(movieContainer).find(".csfd").replaceWith(csfdElmTxt);
+        else
+            $(movieContainer).after(csfdElmTxt);
+    }
+
+    function csfdFindMovie(movieContainer)
+    {
+        var nazev = $("div a", movieContainer).attr("aria-label");
+        var responseUrl;
+        var csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount;
+        $.get("https://www.csfd.cz/hledat/?q="+nazev).done(function (data)
+        {
+            responseUrl = $(data).filter("link[rel='canonical']").attr("href");
+            if(responseUrl.includes("/film/")) // přímo film
+            {
+                csfdHtml = $(data);
+                movie = $(data).find('#pg-web-film')[0];
+                href = responseUrl;
+                name = $("h1[itemprop='name']", movie).text();
+                var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
+                rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
+                ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content");
+                ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content");
+
+                csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+            }
+            else // vysledek hledani
+            {
+                csfdHtml = $(data);
+                movie = $(data).find('#search-films ul li')[0];
+                href = "https://www.csfd.cz/" + $("a", movie).attr("href");
+                $.get(href).done(function (data2)
+                {
+                    responseUrl = $(data2).filter("link[rel='canonical']").attr("href");
+                    csfdHtml = $(data2);
+                    movie = $(data2).find('#pg-web-film')[0];
+                    href = responseUrl;
+                    name = $("h1[itemprop='name']", movie).text();
+                    var bodyClass = data2.substring(data2.indexOf("<body class="), data2.indexOf(" id=", data2.indexOf("<body class=")));
+                    rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
+                    ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content");
+                    ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content");
+
+                    csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+                });
+            }
+        });
+    }
+
     function csfdInfoAddOne(elm)
     {
         var movieContainer = $(elm);
@@ -31,33 +84,7 @@
 
         if ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element) && $(".csfd", $(movieContainer)).length == 0 && nazev !== undefined)
         {
-            $.get("https://www.csfd.cz/hledat/?q="+nazev).done(function (data) {
-                //debugger;
-                var responseUrl = $(data).filter("link[rel='canonical']").attr("href");
-                var csfdHtml, movie, href, name, rankingColor;
-                if(responseUrl.includes("/film/")) // přímo film
-                {
-                    csfdHtml = $(data);
-                    movie = $(data).find('#pg-web-film')[0];
-                    href = responseUrl;
-                    name = $("h1[itemprop='name']", movie).text();
-                    var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
-                    rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
-                }
-                else // vysledek hledani
-                {
-                    csfdHtml = $(data);
-                    movie = $(data).find('#search-films ul li')[0];
-                    href = "https://www.csfd.cz/" + $("a", movie).attr("href");
-                    name = $("a.film", movie).text();
-                    rankingColor = $("a.film", movie).hasClass("c1") ? "#b01" : $("a.film", movie).hasClass("c2") ? "#658db4" : $("a.film", movie).hasClass("c3") ? "#535353" : "#ccc";
-                }
-                var csfdElmTxt = "<div class='csfd' style='position: absolute; z-index:10; margin-top: 1px; background-color:" + rankingColor + "'><a href='" + href + "'>" + "CSFD" + "</a></div>";
-                if ($(movieContainer).find(".csfd").length > 0)
-                    $(movieContainer).find(".csfd").replaceWith(csfdElmTxt);
-                else
-                    $(movieContainer).after(csfdElmTxt);
-            });
+            var csfdMovieData = csfdFindMovie(movieContainer);
         }
     }
 
