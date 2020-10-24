@@ -1,14 +1,26 @@
 // ==UserScript==
 // @name         HBO GO
 // @namespace    https://github.com/Martas86/TamperMonkey
-// @version      0.3
+// @version      0.4
 // @description  try to take over the world!
 // @author       You
 // @match        https://hbogo.cz/*
-// @grant        none
+// @grant        GM_addStyle
+// @require 	 https://code.jquery.com/jquery-latest.js
 // @downloadURL  https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/HBO-GO.user.js
 // @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/HBO-GO.user.js
 // ==/UserScript==
+
+GM_addStyle ( `
+    div.csfd {
+position: absolute;
+z-index:10;
+margin-top: -15px;
+padding:1px 3px 1px 3px;
+font: 300 14px "Gotham SSm A","Gotham SSm B",Arial,Helvetica,sans-serif;
+font-weight:bold;
+    }
+` );
 
 (function() {
     'use strict';
@@ -37,6 +49,51 @@
         });
     }
 
+    function csfdInfoFill(movieContainer, data)
+    {
+        var csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount;
+
+        var responseUrl = $(data).filter("link[rel='canonical']").attr("href");
+        csfdHtml = $(data);
+        movie = $(data).find('#pg-web-film')[0];
+        href = responseUrl;
+        name = $("h1[itemprop='name']", movie).text();
+        var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
+        rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
+        ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content") || "?";
+        ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content") || "?";
+
+        var csfdElmTxt = "<div class='csfd' style='background-color:" + rankingColor + ";'><a href='" + href + "'>" + "CSFD" + " / " + ratingValue + "% / " + ratingCount + "</a></div>";
+         $(movieContainer).append(csfdElmTxt);
+    }
+
+    function csfdFindMovie(movieContainer)
+    {
+        var nazevEng = $(movieContainer).attr("data-eng-title");
+        var nazev = $(".title", movieContainer).text();
+        var rok = $(".year", movieContainer).text();
+        var responseUrl;
+        var csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount;
+        $.get("https://www.csfd.cz/hledat/?q="+nazevEng+" " + rok).done(function (data)
+        {
+            responseUrl = $(data).filter("link[rel='canonical']").attr("href");
+            if(responseUrl.includes("/film/")) // přímo film
+            {
+                csfdInfoFill(movieContainer, data);
+            }
+            else // vysledek hledani
+            {
+                csfdHtml = $(data);
+                movie = $(data).find('#search-films ul li')[0];
+                href = "https://www.csfd.cz/" + $("a", movie).attr("href");
+                $.get(href).done(function (data2)
+                {
+                    csfdInfoFill(movieContainer, data2);
+                });
+            }
+        });
+    }
+
     function csfdInfoAdd(selector)
     {
         $(selector).each(function() {
@@ -52,29 +109,7 @@
 
             if ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element) && $(".csfd", $(movieContainer)).length == 0 && nazevEng !== undefined)
             {
-                $.get("https://www.csfd.cz/hledat/?q="+nazevEng+" " + rok).done(function (data) {
-                    //debugger;
-                    var responseUrl = $(data).filter("link[rel='canonical']").attr("href");
-                    var csfdHtml, movie, href, name, rankingColor;
-                    if(responseUrl.includes("/film/")) // přímo film
-                    {
-                        csfdHtml = $(data);
-                        movie = $(data).find('#pg-web-film')[0];
-                        href = responseUrl;
-                        name = $("h1[itemprop='name']", movie).text();
-                        var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
-                        rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
-                    }
-                    else // vysledek hledani
-                    {
-                        csfdHtml = $(data);
-                        movie = $(data).find('#search-films ul li')[0];
-                        href = "https://www.csfd.cz/" + $("a", movie).attr("href");
-                        name = $("a.film", movie).text();
-                        rankingColor = $("a.film", movie).hasClass("c1") ? "#b01" : $("a.film", movie).hasClass("c2") ? "#658db4" : $("a.film", movie).hasClass("c3") ? "#535353" : "#ccc";
-                    }
-                    $(movieContainer).append("<div class='csfd' style='position: absolute; margin-top: -15px; background-color:" + rankingColor + "'><a href='" + href + "'>" + "CSFD" + "</a></div>");
-                });
+                csfdFindMovie(movieContainer);
             }
         });
     }
@@ -115,5 +150,5 @@
             //console.log("Haven't scrolled in 250ms!");
         }, 250));
     });
-    
+
 })();

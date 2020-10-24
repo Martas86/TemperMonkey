@@ -1,15 +1,26 @@
 // ==UserScript==
 // @name         Netflix
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.netflix.com/*
-// @grant        none
+// @grant        GM_addStyle
 // @require 	 https://code.jquery.com/jquery-latest.js
 // @downloadURL  https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/Netflix.user.js
 // @updateURL    https://raw.githubusercontent.com/Martas86/TemperMonkey/master/Release/Netflix.user.js
 // ==/UserScript==
+
+GM_addStyle ( `
+    div.csfd {
+position: absolute;
+z-index:10;
+margin-top: 1px;
+padding:1px 3px 1px 3px;
+font: 300 14px "Gotham SSm A","Gotham SSm B",Arial,Helvetica,sans-serif;
+font-weight:bold;
+    }
+` );
 
 (function() {
     'use strict';
@@ -17,11 +28,23 @@
     // Your code here...
     var $ = window.jQuery;
 
-    function csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+    function csfdInfoFill(movieContainer, data)
     {
-        var csfdElmTxt = "<div class='csfd' style='position: absolute; z-index:10; margin-top: 1px; background-color:" + rankingColor + "'><a href='" + href + "'>" + "CSFD" + " / " + ratingValue + "% / " + ratingCount + "</a></div>";
-        if ($(movieContainer).find(".csfd").length > 0)
-            $(movieContainer).find(".csfd").replaceWith(csfdElmTxt);
+        var csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount;
+
+        var responseUrl = $(data).filter("link[rel='canonical']").attr("href");
+        csfdHtml = $(data);
+        movie = $(data).find('#pg-web-film')[0];
+        href = responseUrl;
+        name = $("h1[itemprop='name']", movie).text();
+        var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
+        rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
+        ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content") || "?";
+        ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content") || "?";
+
+        var csfdElmTxt = "<div class='csfd' style='background-color:" + rankingColor + ";'><a href='" + href + "'>" + "CSFD" + " / " + ratingValue + "% / " + ratingCount + "</a></div>";
+        if ($(movieContainer).parent().find(".csfd").length > 0)
+            $(movieContainer).parent().find(".csfd").replaceWith(csfdElmTxt);
         else
             $(movieContainer).after(csfdElmTxt);
     }
@@ -36,16 +59,7 @@
             responseUrl = $(data).filter("link[rel='canonical']").attr("href");
             if(responseUrl.includes("/film/")) // přímo film
             {
-                csfdHtml = $(data);
-                movie = $(data).find('#pg-web-film')[0];
-                href = responseUrl;
-                name = $("h1[itemprop='name']", movie).text();
-                var bodyClass = data.substring(data.indexOf("<body class="), data.indexOf(" id=", data.indexOf("<body class=")));
-                rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
-                ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content");
-                ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content");
-
-                csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+                csfdInfoFill(movieContainer, data);
             }
             else // vysledek hledani
             {
@@ -54,17 +68,7 @@
                 href = "https://www.csfd.cz/" + $("a", movie).attr("href");
                 $.get(href).done(function (data2)
                 {
-                    responseUrl = $(data2).filter("link[rel='canonical']").attr("href");
-                    csfdHtml = $(data2);
-                    movie = $(data2).find('#pg-web-film')[0];
-                    href = responseUrl;
-                    name = $("h1[itemprop='name']", movie).text();
-                    var bodyClass = data2.substring(data2.indexOf("<body class="), data2.indexOf(" id=", data2.indexOf("<body class=")));
-                    rankingColor = bodyClass.includes("th-1") ? "#b01" : bodyClass.includes("th-2") ? "#658db4" : bodyClass.includes("th-3") ? "#535353" : "#ccc";
-                    ratingValue = $("#rating meta[itemprop='ratingValue']", movie).prop("content");
-                    ratingCount = $("#rating meta[itemprop='ratingCount']", movie).prop("content");
-
-                    csfdInfoFill(movieContainer, csfdHtml, movie, href, name, rankingColor, ratingValue, ratingCount)
+                    csfdInfoFill(movieContainer, data2);
                 });
             }
         });
@@ -84,14 +88,15 @@
 
         if ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element) && $(".csfd", $(movieContainer)).length == 0 && nazev !== undefined)
         {
-            var csfdMovieData = csfdFindMovie(movieContainer);
+            csfdFindMovie(movieContainer);
         }
     }
 
     function csfdInfoAdd(selector)
     {
         $(selector).each(function() {
-            csfdInfoAddOne($(this));
+            if($(this).is(":visible"))
+                csfdInfoAddOne($(this));
         });
     }
 
@@ -108,7 +113,6 @@
         clearTimeout($.data(this, 'scrollTimer'));
         $.data(this, 'scrollTimer', setTimeout(function() {
             csfdInfoAdd(".title-card");
-            //console.log("Haven't scrolled in 250ms!");
         }, 250));
     });
 
